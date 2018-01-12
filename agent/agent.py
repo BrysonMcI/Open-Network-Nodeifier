@@ -4,6 +4,9 @@ import pyshark
 import os
 import socket
 import sys
+import time
+
+RETRY_TIMEOUT = 2
 
 def get_agent_ip():
     try:
@@ -11,18 +14,21 @@ def get_agent_ip():
         s.connect(("8.8.8.8", 80))
         ip = s.getsockname()[0]
         s.close()
-    except:
+    except Exception:
         ip = socket.gethostbyname(socket.gethostname())
     return ip
 
 def capture_and_send(server='localhost:8000', myIP='localhost'):
     # Assume Linux client
     interfaces = os.listdir('/sys/class/net')
+    if 'lo' in interfaces:
+        interfaces.remove('lo')
     capture = pyshark.LiveCapture(interface=interfaces)
     print("Capturing on: {}\nDetected local address: {}\nServer Address: {}".format(interfaces, myIP, server))
 
 # create our websocket to send data to server
     ws = websocket.create_connection('ws://{}/ws/agents'.format(server))
+    print("Connection established")
     for packet in capture.sniff_continuously():
         data = {}
         # ignore pure layer 2 for now
@@ -48,17 +54,26 @@ def capture_and_send(server='localhost:8000', myIP='localhost'):
             ws.send(data)
     ws.close()
 
-if __name__=="__main__":
+def main():
     myIP = get_agent_ip()
     server = 'localhost:8000'
     if len(sys.argv) > 1:
         server = sys.argv[1]
-    try:
-        capture_and_send(server=server, myIP=myIP)
-    except ConnectionRefusedError:
-        print("Connection refused, is the server down?")
-    except BrokenPipeError:
-        print("Connection to server broken, is it down?")
+    # may eventually want to change this
+    while True:
+        try:
+            capture_and_send(server=server, myIP=myIP)
+        except ConnectionRefusedError:
+            print("Connection refused, is the server down?")
+        except ConnectionResetError:
+            print("Connection reset, server probably crashed")
+        except BrokenPipeError:
+            print("Connection to server broken, is it down?")
+        print("Retrying connection...\n")
+        time.sleep(RETRY_TIMEOUT)
+
+if __name__ == "__main__":
+    main()
 
 """
 Sample json being sent

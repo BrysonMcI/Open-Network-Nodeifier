@@ -170,6 +170,7 @@ function updateGraph() {
     // texts
     textElements = textGroup.selectAll('text')
         .data(nodes, function (node) { return node.id })
+    textElements.text(function (node) { return node.label });
     textElements.exit().remove()
     var textEnter = textElements
         .enter()
@@ -206,6 +207,8 @@ function updateSimulation() {
 // to trigger the initial render
 updateSimulation()
 
+var dns_table = {};
+
 var socket = new WebSocket("ws://" + window.location.host + "/ws/webapp");
 socket.onopen = function (evt) {
     alertify.success('Connected to Log Server');
@@ -214,8 +217,22 @@ socket.onerror = function (evt) {
     console.error("Connection Error");
 }
 socket.onmessage = function (evt) {
-    var p = evt.data;
-    addPacket(JSON.parse(p));
+    var p = JSON.parse(evt.data);
+    switch(p.type) {
+        case 'dns': {
+            //console.log('dns', p.data);    
+            dns_table[p.data.ip] = p.data.name;
+            break;
+        }
+        case 'traffic': {
+            addPacket(p.data);
+            break;
+        }
+        default: {
+            console.log('received unknown data', p);
+            return;
+        }
+    }
 }
 socket.onclose = function (evt) {
     alertify.message("Connection Closed");
@@ -317,3 +334,21 @@ setInterval(function(){
     recentRuleTriggers = []
 }, clearRecentRules);
 
+function showNames() {
+    var c = 0;
+    for (var i = 0; i < nodes.length; i++) {
+        if (dns_table[nodes[i].id]) {
+            nodes[i].label = dns_table[nodes[i].id];
+            console.log('found named node', nodes[i])
+            c++;
+        }
+    }
+    return c;
+}
+
+function showIPs() {
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].label = nodes[i].id;
+    }
+    return nodes.length;
+}
