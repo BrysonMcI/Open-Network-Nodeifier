@@ -16,6 +16,7 @@ const wss_webapp = new WebSocket.Server({noServer: true});
 app.use(express.static(__dirname +'/public'))
 
 var packets = [];
+// can eventually just use the clients attribute of the wss (and .forEach)
 var sockets = new Set();
 
 app.get('/', function(req, res) {
@@ -25,6 +26,8 @@ app.get('/', function(req, res) {
 app.get('/packets', function(req, res) {
     res.send(packets);
 });
+
+app.get('/dns', aux.sendDNSTable);
 
 server.on('upgrade', (request, socket, head) => {
     const pathname = url.parse(request.url).pathname;
@@ -66,7 +69,7 @@ server.on('upgrade', (request, socket, head) => {
     } else if(pathname === '/ws/webapp') {
         wss_webapp.handleUpgrade(request, socket, head, (ws) => {
             wss_webapp.emit('connection', ws);
-            console.log("webapp connection opened");
+            console.log("webapp connection opened, total webapps:", wss_webapp.clients.size);
             for(let item of packets) {
                 ws.send(item);
             }
@@ -78,7 +81,7 @@ server.on('upgrade', (request, socket, head) => {
             ws.onclose = function(evt) {
                 sockets.delete(evt.target);
                 aux.setSockets(sockets);
-                console.log("webapp connection closed");
+                console.log("webapp connection closed, total webapps:", wss_webapp.clients.size);
             }
         });
     } else {

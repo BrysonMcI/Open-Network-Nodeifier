@@ -56,7 +56,7 @@ function getTextColor(node, neighbors) {
 var width = Math.round(window.innerWidth - (window.innerWidth * .1))
 var height = Math.round(window.innerHeight - (window.innerHeight * .1))
 var svg = d3.select('svg')
-svg.attr('width', width).attr('height', height)
+// svg.attr('width', width).attr('height', height)
 var linkElements,
     nodeElements,
     textElements
@@ -167,6 +167,22 @@ function updateGraph() {
         // to update the graph on every click
         .on('click', selectNode)
     nodeElements = nodeEnter.merge(nodeElements)
+    // register custom right click behavior
+    nodeElements.on("contextmenu", function(data, index) {
+        d3.event.preventDefault();
+        var info = document.getElementById('node-info');
+        // purge the previous values from the list
+        while (info.firstChild) {
+            info.removeChild(info.firstChild);
+        }
+        // now show the new values
+        for (let item in data) {
+            var l = document.createElement('li');
+            var t = document.createTextNode(item + ": " + data[item]);
+            l.appendChild(t);
+            info.appendChild(l);
+        }
+    });
     // texts
     textElements = textGroup.selectAll('text')
         .data(nodes, function (node) { return node.id })
@@ -339,7 +355,6 @@ function showNames() {
     for (var i = 0; i < nodes.length; i++) {
         if (dns_table[nodes[i].id]) {
             nodes[i].label = dns_table[nodes[i].id];
-            console.log('found named node', nodes[i])
             c++;
         }
     }

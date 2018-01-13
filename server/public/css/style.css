@@ -1,0 +1,35 @@
+/* setup basic layout */
+div#graph-container {
+    padding: 1%;
+    width: 80vmax;
+    height: 100vmin;
+}
+svg#graph-area {
+    width: 100%;
+    height: 100%;
+}
+nav#controls {
+    width: 20vmax;
+    height: 100vmax;
+    padding: 1%;
+}
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+/* navigation/controls */
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+nav li a {
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+nav li a:hover {
+    color: green;
+}

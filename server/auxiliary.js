@@ -29,7 +29,6 @@ exports.checkIP = function(ip) {
 
 exports.setSockets = function(s) {
     sockets = s;
-    console.log('new webapp socket count', sockets.size);
 }
 
 // wrapper for sending custom event to all web clients
@@ -41,4 +40,8 @@ function sendUpdate(event, data) {
     sockets.forEach(function(sock) {
         sock.send(JSON.stringify(struct));
     });
+}
+
+exports.sendDNSTable = function(req, res) {
+    res.json(dns_cache);
 }

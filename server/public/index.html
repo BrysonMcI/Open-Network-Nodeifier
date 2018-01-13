@@ -1,8 +1,47 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-
-<svg></svg>
-
+<head>
+    <meta charset="utf-8">
+    <title>on&sup2;</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <div id="graph-container">
+        <svg id="graph-area"></svg>
+    </div>
+    <nav id="controls">
+        <ul>
+            <li><a href="#" onclick="showNames()">Show Names</a></li>
+            <li><a href="#" onclick="showIPs()">Show IPs</a></li>
+            <li><a href="#" onclick="refreshDNS()">Refresh DNS</a></li>
+        </ul>
+        <ol id="node-info">Node Info</ol>
+    </nav>
+</body>
+<script>
+    var xhr = function(path) {
+        return new Promise(function(resolve, reject) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    resolve(this.responseText);
+                } else if (this.readyState == 4 && this.status >= 400) {
+                    reject('bad response code');
+                }
+            };
+            xhttp.open("GET", path, true);
+            xhttp.send();
+        });
+    }
+    function refreshDNS() {
+        var dns = xhr('/dns');
+        dns.then(function(result) {
+            //console.log('response', result); // "Stuff worked!"
+            dns_table = JSON.parse(result);
+        }, function(err) {
+            console.log('error', err); // Error: "It broke"
+        });
+    }
+</script>
 <!-- ALERTIFY -->
 <!-- JavaScript -->
 <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.11.0/build/alertify.min.js"></script>
