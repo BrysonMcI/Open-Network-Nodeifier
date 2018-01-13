@@ -13,6 +13,7 @@
             <li><a href="#" onclick="showNames()">Show Names</a></li>
             <li><a href="#" onclick="showIPs()">Show IPs</a></li>
             <li><a href="#" onclick="refreshDNS()">Refresh DNS</a></li>
+            <li><a href="#" onclick="showDNS()">Show DNS</a></li>
         </ul>
         <ol id="node-info">Node Info</ol>
     </nav>
@@ -40,6 +41,18 @@
         }, function(err) {
             console.log('error', err); // Error: "It broke"
         });
+    }
+    function showDNS() {
+        let info = document.getElementById('node-info');
+        while (info.firstChild) {
+            info.removeChild(info.firstChild);
+        }
+        for (let el in dns_table) {
+            let l = document.createElement('li');
+            let t = document.createTextNode(el + ": " + dns_table[el]);
+            l.appendChild(t);
+            info.appendChild(l);
+        }
     }
 </script>
 <!-- ALERTIFY -->

@@ -328,7 +328,7 @@ async function processTick(){
     // -1 is never expire
     var x = baseNodes.length
     while(x--){
-        if (baseNodes[x].expiration != -1 && !isNaN(baseNodes[x].expiration) ){
+        if (baseNodes[x].expiration > -1 && !isNaN(baseNodes[x].expiration) ){
         baseNodes[x].expiration -= tickValue/1000
             if (baseNodes[x].expiration < 0){
                 baseNodes.splice(x,x)

@@ -1,8 +1,8 @@
 /* setup basic layout */
 div#graph-container {
-    padding: 1%;
+    padding: 2vmin;
     width: 80vmax;
-    height: 100vmin;
+    height: 96vmin;
 }
 svg#graph-area {
     width: 100%;
@@ -10,8 +10,8 @@ svg#graph-area {
 }
 nav#controls {
     width: 20vmax;
-    height: 100vmax;
-    padding: 1%;
+    height: 96vmin;
+    padding: 2vmin;
 }
 body {
     margin: 0;
